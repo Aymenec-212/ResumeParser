@@ -1,14 +1,18 @@
 # github_extractor/api_client.py
 import os
 import re
-import time
+import json
 import base64
 import requests
 from dotenv import load_dotenv
-from typing import List, Optional
+from typing import Optional
 
-# Import our new Pydantic models
-from .models import GitHubProfile, GitHubRepository
+# --- NEW: Import OpenAI and config ---
+from openai import OpenAI
+from cv_extractor.config import OPENAI_API_KEY
+
+# Import our updated Pydantic models
+from .models import GitHubProfile, GitHubRepository, ParsedReadme
 
 # Load environment variables from .env file
 load_dotenv()
@@ -24,12 +28,60 @@ class GitHubApiClient:
         if not self.github_token:
             raise ValueError("GITHUB_TOKEN not found in .env file. Please add it.")
 
+        self.openai_client = OpenAI(api_key=OPENAI_API_KEY)
+
         self.headers = {
             "Accept": "application/vnd.github+json",
             "Authorization": f"Bearer {self.github_token}",
             "X-GitHub-Api-Version": "2022-11-28"
         }
         self.base_url = "https://api.github.com"
+
+        # --- NEW: The LLM README Parser Method ---
+    def _parse_readme_with_llm(self, readme_content: str) -> Optional[ParsedReadme]:
+            """
+            Uses an LLM to parse unstructured README text into a structured
+            ParsedReadme Pydantic model.
+            """
+            if not readme_content:
+                return None
+
+            output_schema = ParsedReadme.model_json_schema()
+
+            prompt = f"""
+            You are a highly intelligent data extraction bot. Your task is to analyze the following GitHub profile README markdown text and extract structured information.
+
+            **README Content:**
+            ---
+            {readme_content}
+            ---
+
+            **Instructions:**
+            1.  Analyze the text to identify the user's primary tech stack, personal projects, and a brief summary of their professional focus.
+            2.  Do NOT invent any information. Only extract what is explicitly mentioned or clearly implied in the text.
+            3.  For projects, extract the name, a description, and any mentioned technologies.
+            4.  Your output MUST be a valid JSON object that strictly adheres to the following JSON Schema. Do not add any commentary.
+
+            **JSON Schema:**
+            {json.dumps(output_schema, indent=2)}
+            """
+
+            try:
+                response = self.openai_client.chat.completions.create(
+                    model="gpt-4o",
+                    response_format={"type": "json_object"},
+                    messages=[
+                        {"role": "system",
+                         "content": "You are a data extractor that only outputs JSON conforming to a provided schema."},
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                parsed_data = json.loads(response.choices[0].message.content)
+                # Validate the LLM's output against our Pydantic model
+                return ParsedReadme(**parsed_data)
+            except Exception as e:
+                print(f"Error parsing GitHub README with LLM: {e}")
+                return None  # Fail gracefully
 
     def _get_user_named_repo_readme(self, username: str) -> Optional[str]:
         """Fetches the content of the user's special profile README."""
@@ -54,7 +106,7 @@ class GitHubApiClient:
         user_resp = requests.get(user_url, headers=self.headers)
         if user_resp.status_code != 200:
             raise Exception(f"GitHub user {username} not found ({user_resp.status_code})")
-        user_data = user_resp.json()
+        user_data = requests.get(f"{self.base_url}/users/{username}", headers=self.headers).json()
 
         # 2. Get repository data
         repos_url = f"{self.base_url}/users/{username}/repos"
@@ -62,13 +114,13 @@ class GitHubApiClient:
         repos = repos_resp.json() if repos_resp.status_code == 200 else []
 
         # Pydantic will automatically validate this list of dictionaries
-        repos_list = [
-            {"repo_name": r.get("name"), "repo_description": r.get("description") or ""}
-            for r in repos if r.get("name")
-        ]
+        repos_list = requests.get(f"{self.base_url}/users/{username}/repos", headers=self.headers).json()
 
-        # 3. Get README content
+        # 3. Get raw README content
         readme_content = self._get_user_named_repo_readme(username)
+
+        # 4. Parse it with the LLM if it exists
+        parsed_readme_data = self._parse_readme_with_llm(readme_content)
 
         # 4. Assemble and validate the data using our Pydantic model
         github_profile = GitHubProfile(
@@ -80,8 +132,9 @@ class GitHubApiClient:
             email=user_data.get("email"),
             company=user_data.get("company"),
             website=user_data.get("blog"),
-            repos=repos_list,
+            repos=[{"repo_name": r.get("name"), "repo_description": r.get("description") or ""} for r in repos_list if r.get("name")],
             user_named_repo_readme=readme_content,
+            parsed_readme=parsed_readme_data,
         )
 
         return github_profile

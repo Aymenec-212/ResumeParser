@@ -58,7 +58,8 @@ class ProfileUnifier:
             elif isinstance(source, GitHubProfile):
                 source_data['github'] = source.model_dump()
                 full_name = full_name or source.name
-                summary = summary or source.bio
+                # Prioritize the LLM-generated summary from the README
+                summary = summary or (source.parsed_readme.summary if source.parsed_readme else None) or source.bio
                 location = location or source.location
                 contact_info['github_url'] = f"https://github.com/{source.username}"
                 contact_info['website'] = source.website
@@ -66,9 +67,24 @@ class ProfileUnifier:
                 for repo in source.repos:
                     all_projects.append(
                         {"project_name": repo.repo_name, "description": repo.repo_description, "source": "GitHub"})
+                if source.parsed_readme:
+                    # Add skills from the README's tech stack
+                    for skill in source.parsed_readme.tech_stack:
+                        all_skills.add(skill.lower())
+                    # Add detailed projects from the README
+                    for project in source.parsed_readme.projects:
+                        all_projects.append({
+                            "project_name": project.project_name,
+                            "description": project.description,
+                            "source": "GitHub README"
+                        })
+
+
 
         # --- De-duplication Logic (Simple version for PoC) ---
         unique_work_experience = {(exp['company_name'], exp['job_title']): exp for exp in all_work_experience}.values()
+
+
 
         # --- Assemble the UnifiedProfile ---
         unified_profile = UnifiedProfile(
