@@ -1,0 +1,45 @@
+cv-extractor/
+├── .env.example                # Example environment variables (e.g., API keys)
+├── .gitignore                  # Standard git ignore file
+├── pyproject.toml              # Project metadata and dependencies (modern standard)
+├── README.md                   # Project documentation
+│
+├── cv_extractor/               # Main source code package
+│   ├── __init__.py
+│   │
+│   ├── config.py               # Handles loading configuration and secrets
+│   │
+│   ├── pipeline.py             # The main orchestrator/entry point of the module
+│   │
+│   ├── models/                 # Pydantic data models for structured output
+│   │   ├── __init__.py
+│   │   ├── cv_models.py        # Main models: ExtractedCV, Experience, Skill, etc.
+│   │   └── common.py           # Common models, like the crucial Evidence model
+│   │
+│   ├── parsers/                # Module for reading and parsing different file formats
+│   │   ├── __init__.py
+│   │   ├── base_parser.py      # Abstract base class for all parsers
+│   │   ├── docx_parser.py      # Implementation for .docx files
+│   │   ├── pdf_parser.py       # Implementation for .pdf files
+│   │   └── factory.py          # A factory to get the correct parser for a file type
+│   │
+│   ├── extractors/             # The core logic for data extraction (Hybrid Approach)
+│   │   ├── __init__.py
+│   │   ├── nlp_skill_extractor.py # NLP-based extractor for keyword matching & evidence
+│   │   ├── llm_data_extractor.py # LLM-based extractor for overall structure and inferred skills
+│   │   └── hybrid_manager.py     # Combines results from NLP and LLM extractors
+│   │
+│   └── resources/              # Data resources like skill lists
+│       ├── skills_en.json      # List of technical skills in English
+│       └── skills_fr.json      # List of technical skills in French
+│
+└── tests/                      # Unit and integration tests
+    ├── __init__.py
+    ├── fixtures/               # Sample CV files for testing
+    │   ├── sample_en.pdf
+    │   ├── sample_en.docx
+    │   └── sample_fr.pdf
+    │
+    ├── test_parsers.py         # Tests for file parsing
+    ├── test_extractors.py      # Tests for NLP and LLM extraction logic
+    └── test_pipeline.py        # Integration tests for the full workflow

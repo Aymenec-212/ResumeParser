@@ -1,0 +1,506 @@
+{
+  "full_text": "linkedin.com/in/maimouni-youssef\nyoussefmaimouni03@gmail.com\nCasablanca, Morocco\ngithub.com/youssefmaimouni\n+212 682419203\nPROJECTS\nEDUCATION\nPROFESSIONAL EXPERIENCE\nMAIMOUNI YOUSSEF \nMaster’s student in Data Science, specializing in Artificial Intelligence and Big Data. Strong expertise in Machine Learning, NLP,\nComputer Vision, and Cloud deployment (Azure, AWS). Passionate about innovation, I am seeking a final-year internship starting\nFebruary 2025 to design and deploy intelligent, high-impact solutions.\nJunior Data Scientist | AI, NLP, Computer Vision \nUniversity Hassan II – Faculty of Sciences Aïn Chock, Casablanca | 2021 – 2024\nMaster’s Degree in Computer Science and Mathematics for Data Science\nENSA Khouribga – Sultan Moulay Slimane University | 2024 – 2026\nBachelor’s Degree in Mathematical and Computer Sciences – Database Option\nArtificial Intelligence & Machine Learning: Supervised / Unsupervised Learning, CNN, LSTM, Transformers\nNatural Language Processing & LLMs: TF-IDF, BERT, mT5, Text Mining, RAG (Retrieval-Augmented Generation)\nComputer Vision: YOLOv8, Mask R-CNN, ResNet-50, OpenCV\nBig Data & Data Engineering: Data Collection, Cleaning, Clustering (K-Means), PCA, t-SNE, Power BI, SSIS\nDeployment & Cloud: Flask, FastAPI, Laravel, ReactJS, Docker, Azure, AWS\nDatabases: SQL (MySQL, Oracle), NoSQL (MongoDB), PL/SQL\nLanguages & Tools: Python (Pandas, NumPy, Scikit-learn, TensorFlow, PyTorch), Java, JavaScript, Bash, Git\nSoft Skills: Leadership, Teamwork, Problem Solving, Communication\nLanguages:\nArabic: Native\nFrench: Professional (B2 – Rosetta Stone)\nEnglish: Professional (B2 – Rosetta Stone)\nEnhancing Cloud Cybersecurity with AI (Final Year Project – ENSA Khouribga)\nImplemented and compared multiple models: CNN-LSTM, Random Forest, MLP, XGBoost.\nUsed benchmark datasets (NSL-KDD, UNSW-NB15, CICIDS2017).\nDeployment and testing on Azure & AWS.\nProvided a comparative analysis and intelligent architecture recommendations.\nData Science Intern – SCInc, Casablanca (Hybrid) | Juin – Sept 2025\nDesigned a computer vision pipeline for retail shelf analysis.\nDetection (YOLOv8), segmentation (Mask R-CNN), classification (ResNet-50), validation (ORB + BFMatcher).\nCloud deployment and Agile teamwork on large-scale datasets.\nArabic News Clustering (NLP Project)\nProcessed 52,000+ Arabic articles from 4 media sources.\nHybrid vectorization (TF-IDF + BERT) and dynamic clustering (K-Means → 609 clusters).\nSimilarity analysis (TF-IDF, BERT, Levenshtein) and visualization (PCA, t-SNE).\nAutomatic text summarization (mT5) and image generation (Stable Diffusion).\nWeb Developer Intern – Webagency Maroc, Casablanca | Juin – Août 2024\nDeveloped full-stack applications using Laravel, React.js, and Tailwind CSS.\nDocumented REST APIs with Swagger.\nOptimized performance through Agile methodology.\nAWARDS & DISTINCTIONS\n 1st Place – DevJam Hackathon (ENSIAS IT Club, 2025) : Smart Water Leak Detection System (IoT + AI, single-\nsensor ML solution)\n 2nd Place – Problem Solving Competition (Open Source Days 14.0, ENSA Khouribga, 2024)\n 3rd Place – Hackathon (Open Source Days 14.0, ENSA Khouribga, 2024)\nSKILLS\n",
+  "skills": [
+    {
+      "name": "mysql",
+      "evidence": [
+        {
+          "text_snippet": "mysql"
+        }
+      ]
+    },
+    {
+      "name": "cloud deployment",
+      "evidence": []
+    },
+    {
+      "name": "bert",
+      "evidence": [
+        {
+          "text_snippet": "BERT"
+        },
+        {
+          "text_snippet": "BERT"
+        },
+        {
+          "text_snippet": "BERT"
+        }
+      ]
+    },
+    {
+      "name": "power bi",
+      "evidence": [
+        {
+          "text_snippet": "power bi"
+        }
+      ]
+    },
+    {
+      "name": "numpy",
+      "evidence": [
+        {
+          "text_snippet": "numpy"
+        }
+      ]
+    },
+    {
+      "name": "machine learning",
+      "evidence": [
+        {
+          "text_snippet": "machine learning"
+        },
+        {
+          "text_snippet": "machine learning"
+        },
+        {
+          "text_snippet": "machine learning"
+        }
+      ]
+    },
+    {
+      "name": "bfmatcher",
+      "evidence": []
+    },
+    {
+      "name": "stable diffusion",
+      "evidence": []
+    },
+    {
+      "name": "pytorch",
+      "evidence": [
+        {
+          "text_snippet": "pytorch"
+        }
+      ]
+    },
+    {
+      "name": "data cleaning",
+      "evidence": []
+    },
+    {
+      "name": "swagger",
+      "evidence": [
+        {
+          "text_snippet": "swagger"
+        }
+      ]
+    },
+    {
+      "name": "orb",
+      "evidence": [
+        {
+          "text_snippet": "orb"
+        }
+      ]
+    },
+    {
+      "name": "supervised learning",
+      "evidence": []
+    },
+    {
+      "name": "rag",
+      "evidence": []
+    },
+    {
+      "name": "tf-idf",
+      "evidence": []
+    },
+    {
+      "name": "sql",
+      "evidence": []
+    },
+    {
+      "name": "mask r-cnn",
+      "evidence": []
+    },
+    {
+      "name": "yolov8",
+      "evidence": []
+    },
+    {
+      "name": "french",
+      "evidence": [
+        {
+          "text_snippet": "french"
+        }
+      ]
+    },
+    {
+      "name": "pl/sql",
+      "evidence": []
+    },
+    {
+      "name": "tailwind css",
+      "evidence": []
+    },
+    {
+      "name": "t-sne",
+      "evidence": []
+    },
+    {
+      "name": "docker",
+      "evidence": [
+        {
+          "text_snippet": "docker"
+        }
+      ]
+    },
+    {
+      "name": "bash",
+      "evidence": [
+        {
+          "text_snippet": "bash"
+        }
+      ]
+    },
+    {
+      "name": "scikit-learn",
+      "evidence": []
+    },
+    {
+      "name": "resnet-50",
+      "evidence": []
+    },
+    {
+      "name": "ssis",
+      "evidence": [
+        {
+          "text_snippet": "SSIS"
+        }
+      ]
+    },
+    {
+      "name": "fastapi",
+      "evidence": []
+    },
+    {
+      "name": "java",
+      "evidence": [
+        {
+          "text_snippet": "java"
+        }
+      ]
+    },
+    {
+      "name": "english",
+      "evidence": [
+        {
+          "text_snippet": "english"
+        }
+      ]
+    },
+    {
+      "name": "lstm",
+      "evidence": [
+        {
+          "text_snippet": "LSTM"
+        },
+        {
+          "text_snippet": "LSTM"
+        }
+      ]
+    },
+    {
+      "name": "pandas",
+      "evidence": [
+        {
+          "text_snippet": "pandas"
+        }
+      ]
+    },
+    {
+      "name": "xgboost",
+      "evidence": [
+        {
+          "text_snippet": "xgboost"
+        }
+      ]
+    },
+    {
+      "name": "aws",
+      "evidence": []
+    },
+    {
+      "name": "random forest",
+      "evidence": [
+        {
+          "text_snippet": "random forest"
+        }
+      ]
+    },
+    {
+      "name": "big data",
+      "evidence": []
+    },
+    {
+      "name": "laravel",
+      "evidence": [
+        {
+          "text_snippet": "laravel"
+        },
+        {
+          "text_snippet": "laravel"
+        }
+      ]
+    },
+    {
+      "name": "rest api",
+      "evidence": []
+    },
+    {
+      "name": "computer vision",
+      "evidence": [
+        {
+          "text_snippet": "computer vision"
+        },
+        {
+          "text_snippet": "computer vision"
+        },
+        {
+          "text_snippet": "computer vision"
+        },
+        {
+          "text_snippet": "computer vision"
+        }
+      ]
+    },
+    {
+      "name": "unsupervised learning",
+      "evidence": [
+        {
+          "text_snippet": "unsupervised learning"
+        }
+      ]
+    },
+    {
+      "name": "python",
+      "evidence": [
+        {
+          "text_snippet": "python"
+        }
+      ]
+    },
+    {
+      "name": "git",
+      "evidence": [
+        {
+          "text_snippet": "git"
+        }
+      ]
+    },
+    {
+      "name": "mlp",
+      "evidence": []
+    },
+    {
+      "name": "cnn",
+      "evidence": []
+    },
+    {
+      "name": "azure",
+      "evidence": []
+    },
+    {
+      "name": "reactjs",
+      "evidence": []
+    },
+    {
+      "name": "data collection",
+      "evidence": [
+        {
+          "text_snippet": "data collection"
+        }
+      ]
+    },
+    {
+      "name": "opencv",
+      "evidence": [
+        {
+          "text_snippet": "opencv"
+        }
+      ]
+    },
+    {
+      "name": "natural language processing",
+      "evidence": [
+        {
+          "text_snippet": "natural language processing"
+        }
+      ]
+    },
+    {
+      "name": "artificial intelligence",
+      "evidence": [
+        {
+          "text_snippet": "artificial intelligence"
+        },
+        {
+          "text_snippet": "artificial intelligence"
+        }
+      ]
+    },
+    {
+      "name": "problem solving",
+      "evidence": []
+    },
+    {
+      "name": "text mining",
+      "evidence": [
+        {
+          "text_snippet": "text mining"
+        }
+      ]
+    },
+    {
+      "name": "mongodb",
+      "evidence": [
+        {
+          "text_snippet": "mongodb"
+        }
+      ]
+    },
+    {
+      "name": "javascript",
+      "evidence": [
+        {
+          "text_snippet": "javascript"
+        }
+      ]
+    },
+    {
+      "name": "tensorflow",
+      "evidence": [
+        {
+          "text_snippet": "tensorflow"
+        }
+      ]
+    },
+    {
+      "name": "k-means",
+      "evidence": []
+    },
+    {
+      "name": "nosql",
+      "evidence": [
+        {
+          "text_snippet": "nosql"
+        }
+      ]
+    },
+    {
+      "name": "teamwork",
+      "evidence": [
+        {
+          "text_snippet": "teamwork"
+        },
+        {
+          "text_snippet": "teamwork"
+        }
+      ]
+    },
+    {
+      "name": "communication",
+      "evidence": [
+        {
+          "text_snippet": "communication"
+        }
+      ]
+    },
+    {
+      "name": "arabic",
+      "evidence": [
+        {
+          "text_snippet": "arabic"
+        },
+        {
+          "text_snippet": "arabic"
+        }
+      ]
+    },
+    {
+      "name": "oracle",
+      "evidence": []
+    },
+    {
+      "name": "leadership",
+      "evidence": [
+        {
+          "text_snippet": "leadership"
+        }
+      ]
+    },
+    {
+      "name": "transformers",
+      "evidence": [
+        {
+          "text_snippet": "transformers"
+        }
+      ]
+    },
+    {
+      "name": "pca",
+      "evidence": []
+    },
+    {
+      "name": "flask",
+      "evidence": [
+        {
+          "text_snippet": "flask"
+        }
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "job_title": "Data Science Intern",
+      "company": "SCInc",
+      "description": "Designed a computer vision pipeline for retail shelf analysis. Detection (YOLOv8), segmentation (Mask R-CNN), classification (ResNet-50), validation (ORB + BFMatcher). Cloud deployment and Agile teamwork on large-scale datasets.",
+      "inferred_skills": [
+        "Computer Vision",
+        "Cloud Deployment",
+        "Agile Methodology"
+      ]
+    },
+    {
+      "job_title": "Web Developer Intern",
+      "company": "Webagency Maroc",
+      "description": "Developed full-stack applications using Laravel, React.js, and Tailwind CSS. Documented REST APIs with Swagger. Optimized performance through Agile methodology.",
+      "inferred_skills": [
+        "Laravel",
+        "React.js",
+        "REST API",
+        "Swagger",
+        "Tailwind CSS",
+        "Agile Methodology"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "project_name": "Enhancing Cloud Cybersecurity with AI",
+      "description": "Implemented and compared multiple models: CNN-LSTM, Random Forest, MLP, XGBoost. Used benchmark datasets (NSL-KDD, UNSW-NB15, CICIDS2017). Deployment and testing on Azure & AWS. Provided a comparative analysis and intelligent architecture recommendations.",
+      "inferred_skills": [
+        "CNN-LSTM",
+        "Random Forest",
+        "MLP",
+        "XGBoost",
+        "Azure",
+        "AWS"
+      ]
+    },
+    {
+      "project_name": "Arabic News Clustering",
+      "description": "Processed 52,000+ Arabic articles from 4 media sources. Hybrid vectorization (TF-IDF + BERT) and dynamic clustering (K-Means → 609 clusters). Similarity analysis (TF-IDF, BERT, Levenshtein) and visualization (PCA, t-SNE). Automatic text summarization (mT5) and image generation (Stable Diffusion).",
+      "inferred_skills": [
+        "TF-IDF",
+        "BERT",
+        "K-Means",
+        "PCA",
+        "t-SNE",
+        "mT5",
+        "Levenshtein",
+        "Stable Diffusion"
+      ]
+    }
+  ]
+}
