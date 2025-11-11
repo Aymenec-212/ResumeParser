@@ -1,8 +1,11 @@
-# app/api/auth.py (Definitively Corrected)
+# app/api/auth.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.core import security
+# --- CORRECTED IMPORT ---
+from app.core import security # Use the corrected security functions
+# --- remove passlib import if it was there ---
+# from passlib.context import CryptContext # Remove this
 from app.core.db import get_db
 from app.models.user import User
 from app.schemas import user as user_schema
@@ -27,7 +30,8 @@ def register_user(
             detail="A user with this email already exists in the system.",
         )
 
-    # 2. Hash the password using the corrected security utility
+    # --- Corrected Call ---
+    # This now calls the function that correctly handles hashing and truncation
     hashed_password = security.get_password_hash(user_in.password)
 
     # 3. Create the SQLAlchemy model instance
@@ -59,11 +63,9 @@ def login_for_access_token(
 ):
     user = db.query(User).filter(User.email == form_data.username).first()
 
-    # The password passed to verify_password should also be truncated for consistency,
-    # though verify handles this more gracefully. Let's make it explicit.
-    password_to_check = form_data.password[:72]
-
-    if not user or not security.verify_password(password_to_check, user.hashed_password):
+    # --- Corrected Call for Verification ---
+    # Ensure consistency by passing the string directly, verify handles truncation.
+    if not user or not security.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 # from app.api import auth, profiles
 from app.core.config import settings
+from app.core import security # Ensure this import is present and correct
 
 from app.core.db import Base, engine # Import Base and engine
 from app.api import auth # <-- Import the new auth router

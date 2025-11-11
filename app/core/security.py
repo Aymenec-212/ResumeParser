@@ -1,12 +1,10 @@
 # app/core/security.py
+import bcrypt
 from datetime import datetime, timedelta, timezone
 from typing import Any, Union
-from jose import jwt
-from passlib.context import CryptContext
+from jose import jwt, JWTError # Keep jose for JWT
 from .config import settings
 
-# Setup for password hashing. We use bcrypt.
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # OAuth2 scheme for FastAPI to know how to get the token (e.g., from an "Authorization: Bearer <token>" header)
 from fastapi.security import OAuth2PasswordBearer
@@ -15,20 +13,35 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifies a plain password against a hashed one."""
-    return pwd_context.verify(plain_password, hashed_password)
+    """
+    Verifies a plain password against a hashed one using bcrypt.
+    Ensures the plain password is truncated to 72 bytes before comparison,
+    symmetrically matching the hashing logic.
+    """
+    plain_password_bytes = plain_password.encode('utf-8')
+    # --- FIX: Explicitly truncate the input password ---
+    truncated_password_bytes = plain_password_bytes[:72]
+
+    hashed_password_bytes = hashed_password.encode('utf-8')
+
+    # Compare the truncated input against the stored hash
+    return bcrypt.checkpw(truncated_password_bytes, hashed_password_bytes)
 
 
+# --- NEW: Adjusting for direct bcrypt usage ---
 def get_password_hash(password: str) -> str:
     """
-    Hashes a plain password.
-
-    This function now correctly truncates the password STRING to 72 characters
-    before hashing to comply with bcrypt's limitation.
+    Hashes a plain password using bcrypt.
+    Ensures truncation to 72 bytes for compatibility.
     """
-    # Truncate the string itself. This is the simplest and safest way.
-    truncated_password = password[:72]
-    return pwd_context.hash(truncated_password)
+    # Encode the string to bytes
+    password_bytes = password.encode('utf-8')
+    # Truncate to 72 bytes as required by bcrypt
+    truncated_password_bytes = password_bytes[:72]
+    # Hash the bytes
+    hashed_bytes = bcrypt.hashpw(truncated_password_bytes, bcrypt.gensalt())
+    # Decode the resulting hash back to a string for storage
+    return hashed_bytes.decode('utf-8')
 
 
 def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:
