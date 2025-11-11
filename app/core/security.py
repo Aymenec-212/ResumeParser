@@ -20,8 +20,15 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def get_password_hash(password: str) -> str:
-    """Hashes a plain password."""
-    return pwd_context.hash(password)
+    """
+    Hashes a plain password.
+
+    This function now correctly truncates the password STRING to 72 characters
+    before hashing to comply with bcrypt's limitation.
+    """
+    # Truncate the string itself. This is the simplest and safest way.
+    truncated_password = password[:72]
+    return pwd_context.hash(truncated_password)
 
 
 def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:

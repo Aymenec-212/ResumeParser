@@ -1,10 +1,11 @@
 # app/main.py
 from fastapi import FastAPI
-# We will create and import the routers later
 # from app.api import auth, profiles
 from app.core.config import settings
 
 from app.core.db import Base, engine # Import Base and engine
+from app.api import auth # <-- Import the new auth router
+
 
 # Create all database tables on startup
 Base.metadata.create_all(bind=engine)
@@ -16,6 +17,12 @@ app = FastAPI(
     version="1.0.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
+
+
+# --- Include the new authentication router ---
+app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
+# We will add the profiles router in the next step
+# app.include_router(profiles.router, prefix=f"{settings.API_V1_STR}/profiles", tags=["Profiles"])
 
 # --- Placeholder for future routers ---
 # app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
