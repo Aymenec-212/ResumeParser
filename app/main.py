@@ -4,6 +4,11 @@ from fastapi import FastAPI
 # from app.api import auth, profiles
 from app.core.config import settings
 
+from app.core.db import Base, engine # Import Base and engine
+
+# Create all database tables on startup
+Base.metadata.create_all(bind=engine)
+
 # Initialize the FastAPI app
 app = FastAPI(
     title="AI Profile Enhancer API",
