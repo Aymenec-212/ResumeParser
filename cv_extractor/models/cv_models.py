@@ -39,3 +39,7 @@ class ExtractedCV(BaseModel):
     work_experience: List[WorkExperience] = Field(default=[])
     # --- ADDED FIELD ---
     projects: List[Project] = Field(default=[])
+
+    # --- ADD THIS LINE ---
+    summary: Optional[str] = Field(default=None,
+                                   description="The professional summary or objective extracted from the CV.")

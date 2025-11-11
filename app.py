@@ -1,15 +1,20 @@
 import os
 import uuid
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, flash, redirect, url_for
 from werkzeug.utils import secure_filename
 
-# --- Database and ORM Imports (Commented Out) ---
-# DB: from database.models import db, Profile, Skill
+# --- NEW Authentication and Security Imports ---
+from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from flask_bcrypt import Bcrypt
+
+# --- Database and Form Imports ---
+from database.models import db, Profile, Skill, User
+from forms import LoginForm, RegistrationForm
 
 # --- Core Service Imports ---
 from unification_service.unifier import ProfileUnifier
 from enhancement_service.enhancer import ProfileEnhancer
-# EMBEDDING: from embedding_service import EmbeddingService # Embedding part removed
+# The embedding service is not used in this version, so it's not imported.
 
 # --- Extractor Module Imports ---
 from cv_extractor import extract_cv_data
@@ -22,52 +27,127 @@ from github_extractor.api_client import get_profile_from_github_url
 
 app = Flask(__name__)
 
-# --- Database Configuration (Commented Out) ---
-# DB: app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///profiles.db'
-# DB: app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# CRITICAL: Set a secret key for session management and form protection (CSRF).
+# In a production environment, this MUST be a long, random string loaded from an
+# environment variable to keep it secure.
+app.config['SECRET_KEY'] = 'a-very-secret-and-random-key-for-this-poc'
 
-# Configure File Uploads
+# Configure the SQLite database. This will create a 'profiles.db' file.
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///profiles.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configure the folder for temporary file uploads
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf', 'docx'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# --- Initialize Services ---
-# We only initialize the services needed for the in-memory pipeline.
+# --- Initialize All Services and Extensions ---
+db.init_app(app)
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
+# If a user who is not logged in tries to access a protected page,
+# they will be redirected to the 'login' page.
+#login_manager.login_view = 'login'
+#login_manager.login_message_category = 'info'  # For styling flashed messages
+
+# Initialize our custom services
 unifier = ProfileUnifier()
 enhancer = ProfileEnhancer()
 
 
-# DB: db.init_app(app)
-# EMBEDDING: embedding_service = EmbeddingService() # Embedding part removed
+# --- KEY CHANGE #1: Custom Unauthorized Handler ---
+# Instead of redirecting to a login page, we will return a JSON 401 Unauthorized error.
+# This is what an API client (like Streamlit) expects.
+@login_manager.unauthorized_handler
+def unauthorized():
+    return jsonify({"error": "Authentication required. Please log in."}), 401
+
+# This callback function is required by Flask-Login.
+# It's used to reload the user object from the user ID stored in the session.
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
 
 
 # ==============================================================================
-# --- Helper Functions ---
+# --- API-Friendly Authentication Routes ---
 # ==============================================================================
 
-def allowed_file(filename):
-    """Checks if a file's extension is allowed."""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+@app.route("/api/register", methods=['POST'])
+def api_register():
+    data = request.get_json()
+    if not data or not data.get('email') or not data.get('password') or not data.get('username'):
+        return jsonify({"error": "Missing data"}), 400
+
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({"error": "Email already exists"}), 409  # 409 Conflict
+
+    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    user = User(username=data['username'], email=data['email'], password_hash=hashed_password)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({"message": "User registered successfully"}), 201
+
+
+@app.route("/api/login", methods=['POST'])
+def api_login():
+    data = request.get_json()
+    if not data or not data.get('email') or not data.get('password'):
+        return jsonify({"error": "Missing data"}), 400
+
+    user = User.query.filter_by(email=data.get('email')).first()
+    if user and bcrypt.check_password_hash(user.password_hash, data.get('password')):
+        login_user(user)  # This sets the session cookie
+        return jsonify({
+            "message": "Login successful",
+            "user": {"username": user.username, "email": user.email}
+        }), 200
+
+    return jsonify({"error": "Invalid credentials"}), 401
+
+
+@app.route("/api/logout", methods=['POST'])
+@login_required
+def api_logout():
+    logout_user()
+    return jsonify({"message": "Logout successful"}), 200
+
+
+@app.route("/api/user", methods=['GET'])
+@login_required
+def get_current_user():
+    return jsonify({"username": current_user.username, "email": current_user.email})
 
 
 # ==============================================================================
-# --- API Endpoints ---
+# --- Protected Core API Endpoints ---
+# These are the main endpoints for your application's functionality.
 # ==============================================================================
 
-# NOTE: The /profiles and /profiles/<id>/add_source endpoints are combined into one
-#       stateless endpoint since there is no database to persist a profile between calls.
+@app.route('/api/profiles', methods=['POST'])
+@login_required  # Ensures only logged-in users can create profiles.
+def create_profile():
+    """Creates a new, empty profile record linked to the current user."""
+    profile_id = str(uuid.uuid4())
+    new_profile = Profile(id=profile_id, unified_profile_json={}, user_id=current_user.id)
+    db.session.add(new_profile)
+    db.session.commit()
+    return jsonify({"message": "Profile created successfully", "profile_id": profile_id}), 201
 
-@app.route('/process', methods=['POST'])
-def process_profile_source():
+
+@app.route('/api/profiles/<string:profile_id>/add_source', methods=['POST'])
+@login_required  # Ensures only logged-in users can add sources.
+def add_source_to_profile(profile_id):
     """
-    A single, stateless endpoint to perform the full Extract -> Unify -> Enhance pipeline.
-    It takes a data source, processes it in memory, and returns the final enhanced profile.
+    The main workflow endpoint. It adds data from a source (CV, LinkedIn, GitHub)
+    to a user's profile, triggering the full Unify -> Enhance -> Store pipeline.
     """
+    # CRITICAL SECURITY CHECK: Ensure the user can only modify their own profile.
+    # first_or_404() will automatically return a 404 Not Found error if no profile matches.
+    profile = Profile.query.filter_by(id=profile_id, user_id=current_user.id).first_or_404()
+
     source_type = request.form.get('source_type')
-    if not source_type:
-        return jsonify({"error": "Missing 'source_type' (must be 'cv', 'linkedin', or 'github')"}), 400
-
     new_data = None
 
     # --- Step 1: EXTRACT ---
@@ -76,7 +156,7 @@ def process_profile_source():
             if 'file' not in request.files:
                 return jsonify({"error": "No file part for 'cv' source_type"}), 400
             file = request.files['file']
-            if file.filename and allowed_file(file.filename):
+            if file.filename and '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS:
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
@@ -95,58 +175,43 @@ def process_profile_source():
             new_data = get_profile_from_github_url(url)
 
         else:
-            return jsonify({"error": f"Invalid source_type: '{source_type}'"}), 400
+            return jsonify({"error": "Invalid source_type. Must be 'cv', 'linkedin', or 'github'"}), 400
 
     except Exception as e:
         return jsonify({"error": f"Extraction failed: {str(e)}"}), 500
 
     # --- Step 2: UNIFY ---
-    # We generate a temporary profile_id for this transaction.
-    profile_id = str(uuid.uuid4())
+    # This combines the new data with any existing data for the profile.
     unified_profile = unifier.unify(profile_id, new_data)
 
     # --- Step 3: ENHANCE ---
-    print(f"Enhancing unified profile for temporary id {profile_id}...")
+    # The unified data is polished by the LLM for consistency and presentation.
     enhanced_profile = enhancer.enhance(unified_profile)
 
-    # --- Step 4: RETURN RESULT ---
-    # The pipeline finishes here. The final JSON is returned directly to the client.
+    # --- Step 4: STORE ---
+    # The final, enhanced profile is saved back to the database.
+    profile.unified_profile_json = enhanced_profile.model_dump()
 
-    # DB: The following block for database persistence is commented out.
-    # ---
-    # DB: profile.unified_profile_json = enhanced_profile.model_dump()
-    # DB: profile.skills = [Skill(name=skill_name) for skill_name in enhanced_profile.skills]
-    # DB: profile.qdrant_id = profile_id
-    # DB: db.session.commit()
-    # ---
+    # Update the relational Skill table for potential structured queries in the future.
+    # Clear existing skills and add the new, enhanced list.
+    profile.skills.clear()
+    profile.skills = [Skill(name=skill_name) for skill_name in enhanced_profile.skills]
 
-    # EMBEDDING: The following line for embedding is removed.
-    # ---
-    # EMBEDDING: embedding_service.embed_and_store(enhanced_profile)
-    # ---
+    db.session.commit()
 
     return jsonify({
-        "message": f"Source '{source_type}' processed successfully.",
+        "message": f"Source '{source_type}' added and profile enhanced successfully.",
+        "profile_id": profile_id,
         "enhanced_profile": enhanced_profile.model_dump()
     }), 200
-
-
-# EMBEDDING: The /match endpoint is removed as it depends on the embedding service.
-# ---
-# @app.route('/match', methods=['POST'])
-# def match_profiles():
-#     ...
-# ---
 
 
 # ==============================================================================
 # --- Main Execution Block ---
 # ==============================================================================
 
+# --- Main Execution Block ---
 if __name__ == '__main__':
-    # DB: The database creation logic is commented out.
-    # ---
-    # with app.app_context():
-    #     db.create_all()
-    # ---
+    with app.app_context():
+        db.create_all()
     app.run(debug=True, port=5001)

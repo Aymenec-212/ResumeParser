@@ -15,26 +15,26 @@ class LlmDataExtractor:
 
         # --- UPDATED PROMPT ---
         prompt = f"""
-        You are an expert HR recruitment assistant. Your task is to analyze the following resume text and a list of skills found by an NLP tool.
-        Your goal is to extract structured information, clean up the skill list, and infer new skills from work experience and projects.
+               You are an expert HR recruitment assistant. Your task is to analyze the following resume text and a list of skills found by an NLP tool.
+               Your goal is to extract structured information, clean up the skill list, and infer new skills from the work experience.
 
-        **Resume Text:**
-        ---
-        {cv_text}
-        ---
+               **Resume Text:**
+               ---
+               {cv_text}
+               ---
 
-        **Skills found by NLP Tool:**
-        {nlp_skill_names}
+               **Skills found by NLP Tool:**
+               {nlp_skill_names}
 
-        **Instructions:**
-        1.  **Analyze Work Experience:** Read through the resume text and extract the candidate's work history. For each role, infer skills from the description (e.g., "developed a REST API" implies "REST API").
-        2.  **Analyze Projects:** Look for a "Projects" section. For each project, extract its name, description, and infer relevant technologies or skills mentioned in its description.
-        3.  **Verify NLP Skills:** Review the "Skills found by NLP Tool". Remove any junk, typos, or non-skills (e.g., 'com', 'and', 'experience'). The final skill list should be clean and professional.
-        4.  **Combine All Skills:** The final list of skills should include the verified NLP skills AND all skills you inferred from BOTH work experience and projects. Ensure there are no duplicates.
-        5.  **Format Output:** Your final output MUST be a valid JSON object that strictly follows this JSON schema. Do not add any extra text or explanations outside of the JSON object.
-        Schema:
-        {json.dumps(output_schema, indent=2)}
-        """
+               **Instructions:**
+               1.  **Extract Summary:** Look for a "Summary", "Objective", or "Professional Profile" section at the top of the resume and extract its content. This is the `summary`.
+               2.  **Analyze Work Experience:** Read through the resume text and extract the candidate's work history.
+               3.  **Infer Skills:** For each job, identify skills from the description (e.g., "developed a REST API" implies "REST API").
+               4.  **Verify NLP Skills:** Review the "Skills found by NLP Tool". Remove junk or non-skills.
+               5.  **Combine Skills:** The final skill list should include verified NLP skills and inferred skills.
+               6.  **Format Output:** Your final output MUST be a valid JSON object that strictly follows this JSON schema:
+               {json.dumps(output_schema, indent=2)}
+               """
 
         response = self.client.chat.completions.create(
             model="gpt-4o",

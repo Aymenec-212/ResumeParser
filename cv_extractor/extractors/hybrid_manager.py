@@ -29,9 +29,10 @@ class HybridManager:
         # --- UPDATE THIS BLOCK ---
         final_cv_data = ExtractedCV(
             full_text=text,
+            summary=llm_output.get("summary"), # <-- Add this line to pass the summary
             skills=final_skills,
             work_experience=llm_output.get("work_experience", []),
-            projects=llm_output.get("projects", [])  # <-- Add this line
+            projects=llm_output.get("projects", [])
         )
 
         return final_cv_data
